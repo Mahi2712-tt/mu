@@ -1,0 +1,119 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract MusicIndustry {
+    // Structs
+    struct Artist {
+        address walletAddress;
+        string name;
+        bool isRegistered;
+    }
+
+    struct Music {
+        uint256 id;
+        address artistAddress;
+        string title;
+        string metadataUrl;
+        string coverImageUrl;
+        uint256 price;
+        bool isActive;
+    }
+
+    // State variables
+    mapping(address => Artist) public artists;
+    mapping(uint256 => Music) public music;
+    uint256 private musicCounter;
+
+    // Events
+    event ArtistRegistered(address indexed artistAddress, string name);
+    event MusicUploaded(uint256 indexed musicId, address indexed artist, string title, uint256 price);
+    event MusicPurchased(uint256 indexed musicId, address indexed buyer, address indexed artist);
+
+    // Modifiers
+    modifier onlyRegisteredArtist() {
+        require(artists[msg.sender].isRegistered, "Only registered artists can perform this action");
+        _;
+    }
+
+    // Functions
+    function registerArtist(string memory _name) public {
+        require(!artists[msg.sender].isRegistered, "Artist already registered");
+        require(bytes(_name).length > 0, "Name cannot be empty");
+
+        artists[msg.sender] = Artist({
+            walletAddress: msg.sender,
+            name: _name,
+            isRegistered: true
+        });
+
+        emit ArtistRegistered(msg.sender, _name);
+    }
+
+    function uploadMusic(
+        string memory _title,
+        string memory _metadataUrl,
+        string memory _coverImageUrl,
+        uint256 _price
+    ) public onlyRegisteredArtist {
+        require(bytes(_title).length > 0, "Title cannot be empty");
+        require(bytes(_metadataUrl).length > 0, "Metadata URL cannot be empty");
+        require(_price > 0, "Price must be greater than 0");
+
+        musicCounter++;
+        music[musicCounter] = Music({
+            id: musicCounter,
+            artistAddress: msg.sender,
+            title: _title,
+            metadataUrl: _metadataUrl,
+            coverImageUrl: _coverImageUrl,
+            price: _price,
+            isActive: true
+        });
+
+        emit MusicUploaded(musicCounter, msg.sender, _title, _price);
+    }
+
+    function purchaseMusic(uint256 _musicId) public payable {
+        Music storage musicItem = music[_musicId];
+        require(musicItem.isActive, "Music does not exist or is not active");
+        require(msg.value >= musicItem.price, "Insufficient payment");
+
+        // Transfer payment to artist
+        payable(musicItem.artistAddress).transfer(msg.value);
+
+        emit MusicPurchased(_musicId, msg.sender, musicItem.artistAddress);
+    }
+
+    // View functions
+    function getArtistName(address _artistAddress) public view returns (string memory) {
+        require(artists[_artistAddress].isRegistered, "Artist not registered");
+        return artists[_artistAddress].name;
+    }
+
+    function getMusicDetails(uint256 _musicId) public view returns (
+        uint256 id,
+        address artistAddress,
+        string memory title,
+        string memory metadataUrl,
+        string memory coverImageUrl,
+        uint256 price,
+        bool isActive
+    ) {
+        Music storage musicItem = music[_musicId];
+        require(musicItem.isActive, "Music does not exist or is not active");
+        
+        return (
+            musicItem.id,
+            musicItem.artistAddress,
+            musicItem.title,
+            musicItem.metadataUrl,
+            musicItem.coverImageUrl,
+            musicItem.price,
+            musicItem.isActive
+        );
+    }
+
+    function getMusicCount() public view returns (uint256) {
+        return musicCounter;
+    }
+}
