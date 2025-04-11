@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artist Dashboard - DeMusic</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.ethers.io/lib/ethers-5.7.2.umd.min.js" type="application/javascript"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white">
+    <!-- Navigation -->
+    <nav class="bg-gray-800 fixed w-full z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <a href="index.html" class="flex items-center">
+                        <i class="fas fa-music text-purple-500 text-2xl mr-2"></i>
+                        <span class="text-xl font-bold">DeMusic</span>
+                    </a>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="index.html" class="px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-700">Home</a>
+                        <a href="artist.html" class="px-3 py-2 rounded-md text-sm font-medium text-white bg-gray-900">Artists</a>
+                        <a href="listening.html" class="px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-700">Listen</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="pt-16">
+        <!-- Wallet Connection Status -->
+        <div id="wallet-status" class="bg-gray-800 p-4 text-center">
+            <button id="connect-wallet" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded">
+                Connect Wallet
+            </button>
+            <p id="wallet-address" class="hidden text-gray-300"></p>
+        </div>
+
+        <!-- Artist Registration Section -->
+        <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+            <div class="px-4 py-6 sm:px-0">
+                <div class="bg-gray-800 rounded-lg p-6">
+                    <h2 class="text-2xl font-bold mb-4">Artist Registration</h2>
+                    <form id="registration-form" class="space-y-4">
+                        <div>
+                            <label for="artist-name" class="block text-sm font-medium text-gray-300">
+                                Artist Name
+                            </label>
+                            <input type="text" id="artist-name" name="artist-name" required
+                                class="mt-1 block w-full bg-gray-700 border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-purple-500 focus:border-purple-500">
+                        </div>
+                        <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded">
+                            Register as Artist
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Music Upload Section -->
+        <div id="upload-section" class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 hidden">
+            <div class="px-4 py-6 sm:px-0">
+                <div class="bg-gray-800 rounded-lg p-6">
+                    <h2 class="text-2xl font-bold mb-4">Upload Music</h2>
+                    <form id="upload-form" class="space-y-4">
+                        <div>
+                            <label for="music-title" class="block text-sm font-medium text-gray-300">
+                                Track Title
+                            </label>
+                            <input type="text" id="music-title" name="music-title" required
+                                class="mt-1 block w-full bg-gray-700 border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-purple-500 focus:border-purple-500">
+                        </div>
+                        <div>
+                            <label for="music-url" class="block text-sm font-medium text-gray-300">
+                                Music File URL
+                            </label>
+                            <input type="url" id="music-url" name="music-url" required
+                                class="mt-1 block w-full bg-gray-700 border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-purple-500 focus:border-purple-500">
+                            <p class="mt-1 text-sm text-gray-400">Enter a direct link to your music file (e.g., IPFS URL)</p>
+                        </div>
+                        <div>
+                            <label for="cover-image" class="block text-sm font-medium text-gray-300">
+                                Cover Image URL
+                            </label>
+                            <input type="url" id="cover-image" name="cover-image" required
+                                class="mt-1 block w-full bg-gray-700 border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-purple-500 focus:border-purple-500">
+                            <p class="mt-1 text-sm text-gray-400">Enter a direct link to your album cover image</p>
+                        </div>
+                        <div>
+                            <label for="price" class="block text-sm font-medium text-gray-300">
+                                Price (ETH)
+                            </label>
+                            <input type="number" id="price" name="price" step="0.001" required
+                                class="mt-1 block w-full bg-gray-700 border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-purple-500 focus:border-purple-500">
+                        </div>
+                        <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded">
+                            Upload Music
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status Messages -->
+        <div id="status-message" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4 hidden">
+            <div class="rounded-md p-4">
+                <p class="text-center"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 mt-8">
+        <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-center space-x-6">
+                <a href="#" class="text-gray-400 hover:text-gray-300">
+                    <i class="fab fa-twitter text-xl"></i>
+                </a>
+                <a href="#" class="text-gray-400 hover:text-gray-300">
+                    <i class="fab fa-discord text-xl"></i>
+                </a>
+                <a href="#" class="text-gray-400 hover:text-gray-300">
+                    <i class="fab fa-github text-xl"></i>
+                </a>
+            </div>
+            <div class="mt-8 text-center">
+                <p class="text-base text-gray-400">
+                    &copy; 2024 DeMusic. All rights reserved.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
